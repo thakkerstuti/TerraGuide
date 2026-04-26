@@ -119,14 +119,19 @@ body {
 
 .search-box input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--glass-border);
     padding: 15px 50px 15px 20px;
     border-radius: 20px;
-    color: white;
+    color: #000000; /* Dark text for readability */
     font-size: 1rem;
     outline: none;
     transition: var(--transition);
+}
+
+.search-box input::placeholder {
+    color: #000000; /* Black placeholder as requested */
+    opacity: 0.6;
 }
 
 .search-box input:focus {
