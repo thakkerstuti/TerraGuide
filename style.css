@@ -243,9 +243,55 @@ body {
     text-align: center;
 }
 
-.condition-visual img {
+.weather-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.weather-visual img {
     width: 200px;
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));
+}
+
+/* Custom Sun Icon with Rays */
+.sun-icon {
+    font-size: 8rem;
+    color: #ffce00;
+    position: relative;
+    filter: drop-shadow(0 0 30px rgba(255, 206, 0, 0.6));
+    animation: rotateSun 20s linear infinite;
+}
+
+@keyframes rotateSun {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.sun-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 140%;
+    height: 140%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 206, 0, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* Custom Moon Icon */
+.moon-icon {
+    font-size: 8rem;
+    color: #f1f1f1;
+    filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.5));
+    animation: glowMoon 4s ease-in-out infinite alternate;
+}
+
+@keyframes glowMoon {
+    from { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3)); }
+    to { filter: drop-shadow(0 0 50px rgba(255, 255, 255, 0.6)); }
 }
 
 .condition-text {

@@ -1,7 +1,6 @@
 /**
  * TerraGuide - Radiant Weather Experience
- * Design: Radiant Ombre + Glassmorphism
- * Features: Day/Night dynamic icons, Morning/Evening themes
+ * Features: Radiant Sun with Rays, Glowing Moon, Time-based Themes
  */
 
 // --- DOM ELEMENTS ---
@@ -18,7 +17,7 @@ const recentContainer = document.getElementById('recent-searches');
 
 const cityNameEl = document.getElementById('city-name');
 const dateTodayEl = document.getElementById('date-today');
-const weatherIconEl = document.getElementById('weather-icon');
+const weatherIconContainer = document.getElementById('weather-icon-container');
 const temperatureEl = document.getElementById('temperature');
 const conditionEl = document.getElementById('weather-condition');
 const humidityEl = document.getElementById('humidity');
@@ -103,10 +102,19 @@ function displayWeather(data) {
     humidityEl.textContent = humidity;
     windSpeedEl.textContent = windspeed;
     
-    weatherIconEl.src = condition.icon;
-    weatherIconEl.alt = condition.text;
+    // Update Weather Icon with Custom Sun/Moon
+    weatherIconContainer.innerHTML = ''; // Clear previous
+    if (condition.customIcon) {
+        const icon = document.createElement('i');
+        icon.className = `fas ${condition.customIcon}`;
+        weatherIconContainer.appendChild(icon);
+    } else {
+        const img = document.createElement('img');
+        img.src = condition.icon;
+        img.alt = condition.text;
+        weatherIconContainer.appendChild(img);
+    }
 
-    // Transition Background based on time and condition
     updateTheme(condition.text, isDay);
     
     loadingSpinner.classList.add('hidden');
@@ -115,14 +123,18 @@ function displayWeather(data) {
     weatherDisplay.classList.remove('hidden');
 }
 
-/**
- * Map codes to specific Day/Night icons
- */
 function getWeatherCondition(code, isDay) {
     const suffix = isDay ? 'd' : 'n';
+    
+    // Special Custom Icons for Clear Day (Sun) and Clear Night (Moon)
+    if (code === 0 || code === 1) {
+        return {
+            text: isDay ? 'Sunny' : 'Clear Night',
+            customIcon: isDay ? 'fa-sun sun-icon' : 'fa-moon moon-icon'
+        };
+    }
+
     const conditions = {
-        0: { text: isDay ? 'Sunny' : 'Clear Night', icon: `https://openweathermap.org/img/wn/01${suffix}@4x.png` },
-        1: { text: isDay ? 'Mainly Sunny' : 'Clear', icon: `https://openweathermap.org/img/wn/02${suffix}@4x.png` },
         2: { text: 'Partly Cloudy', icon: `https://openweathermap.org/img/wn/03${suffix}@4x.png` },
         3: { text: 'Overcast', icon: `https://openweathermap.org/img/wn/04${suffix}@4x.png` },
         45: { text: 'Foggy', icon: `https://openweathermap.org/img/wn/50${suffix}@4x.png` },
@@ -135,32 +147,24 @@ function getWeatherCondition(code, isDay) {
     return conditions[code] || { text: 'Variable', icon: `https://openweathermap.org/img/wn/04${suffix}@4x.png` };
 }
 
-/**
- * Radiant Background Logic for Morning, Evening, Day, and Night
- */
 function updateTheme(condition, isDay) {
     const spheres = document.querySelectorAll('.ombre-sphere');
     const hour = new Date().getHours();
     
-    // Default Time-based colors
     let sphere1 = 'conic-gradient(from 180deg at 50% 50%, #4facfe, #00f2fe)';
     let sphere2 = 'conic-gradient(from 0deg at 50% 50%, #f093fb, #f5576c)';
 
     if (!isDay) {
-        // Night Theme
         sphere1 = 'conic-gradient(from 180deg at 50% 50%, #0f0c29, #302b63)';
         sphere2 = 'conic-gradient(from 0deg at 50% 50%, #24243e, #0f0c29)';
     } else if (hour >= 5 && hour < 9) {
-        // Morning Theme
         sphere1 = 'conic-gradient(from 180deg at 50% 50%, #ff9a9e, #fad0c4)';
         sphere2 = 'conic-gradient(from 0deg at 50% 50%, #fbc2eb, #a6c1ee)';
     } else if (hour >= 17 && hour < 20) {
-        // Evening Theme
         sphere1 = 'conic-gradient(from 180deg at 50% 50%, #ff0844, #ffb199)';
         sphere2 = 'conic-gradient(from 0deg at 50% 50%, #667eea, #764ba2)';
     }
 
-    // Weather adjustments override
     const cond = condition.toLowerCase();
     if (cond.includes('rain')) {
         sphere1 = 'conic-gradient(from 180deg at 50% 50%, #203a43, #2c5364)';
