@@ -37,11 +37,10 @@ TerraGuide is a high-performance, responsive weather application designed for mo
 
 ## 📸 Screenshots
 
-*(Add your screenshots here to showcase the stunning UI!)*
+![TerraGuide UI Mockup](terraguide_weather_mockup_1777213958599.png)
 
-- **Clear Weather**: Vibrant sunny gradients.
-- **Rainy Weather**: Deep moody blues with glassmorphism overlays.
-- **Mobile View**: Perfectly scaled for compact devices.
+- **Clear Weather**: Vibrant sunny gradients and glassmorphism.
+- **Responsive Design**: Optimized for both mobile and desktop views.
 
 ---
 
