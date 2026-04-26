@@ -3,115 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TerraGuide | Advanced Weather Intelligence</title>
-    <meta name="description" content="A unique, editorial weather experience with real-time data and dynamic atmospheric themes.">
+    <title>TerraGuide | Radiant Weather Insights</title>
+    <meta name="description" content="A radiant, modern weather experience with real-time data and stunning ombre effects.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-default">
-    <div class="noise-overlay"></div>
-    <div class="background-blob blob-1"></div>
-    <div class="background-blob blob-2"></div>
+<body>
+    <div class="radiant-bg">
+        <div class="ombre-sphere sphere-1"></div>
+        <div class="ombre-sphere sphere-2"></div>
+    </div>
     
-    <div class="dashboard">
+    <div class="app-wrapper">
         <aside class="sidebar">
             <div class="brand">
-                <span class="logo-icon">T</span>
-                <h1>TerraGuide</h1>
+                <span class="logo">TerraGuide</span>
             </div>
             
-            <div class="search-section">
-                <div class="input-wrapper">
-                    <input type="text" id="city-input" placeholder="Find your city..." autocomplete="off">
-                    <button id="search-btn"><i class="fas fa-arrow-right"></i></button>
-                </div>
+            <div class="search-box">
+                <input type="text" id="city-input" placeholder="Search a city..." autocomplete="off">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
             </div>
 
             <div id="recent-searches" class="history-section hidden">
-                <h3>PREVIOUS</h3>
+                <h4>RECENT SEARCHES</h4>
                 <div id="recent-list" class="history-list"></div>
             </div>
 
-            <div class="sidebar-footer">
-                <p>Weather data provided by Open-Meteo. Updated in real-time.</p>
-                <button id="get-location-btn" class="btn-location">
-                    <i class="fas fa-crosshairs"></i> Use Local
-                </button>
-            </div>
+            <button id="get-location-btn" class="location-btn">
+                <i class="fas fa-location-crosshairs"></i> Use My Location
+            </button>
         </aside>
 
-        <main class="main-stage">
-            <div id="initial-state" class="state-view">
-                <div class="hero-text">
-                    <h2>Explore the <br><em>atmosphere.</em></h2>
-                    <p>Enter a city or use your location to begin the experience.</p>
-                </div>
+        <main class="main-content">
+            <!-- Initial State -->
+            <div id="initial-state" class="state-container">
+                <h3>Vibrant <br><span>Atmosphere</span> <br>Real-time.</h3>
+                <p>Search for any city to see the radiant weather transitions.</p>
             </div>
 
-            <div id="loading-spinner" class="state-view hidden">
-                <div class="loading-bar-container">
-                    <div class="loading-bar"></div>
-                </div>
-                <p>SYNCHRONIZING DATA...</p>
+            <!-- Loading State -->
+            <div id="loading-spinner" class="state-container hidden">
+                <div class="loader"></div>
+                <p style="margin-top: 2rem; letter-spacing: 2px;">SYNCING DATA</p>
             </div>
 
-            <div id="error-message" class="state-view hidden">
-                <div class="error-content">
-                    <i class="fas fa-ghost"></i>
-                    <h2>Location lost.</h2>
-                    <p id="error-text">We couldn't find that city. Try something else.</p>
-                </div>
+            <!-- Error State -->
+            <div id="error-message" class="state-container hidden">
+                <i class="fas fa-triangle-exclamation" style="font-size: 4rem; color: #f5576c;"></i>
+                <h3 style="margin-top: 2rem;">Location Lost</h3>
+                <p id="error-text">City not found. Please try again.</p>
             </div>
 
+            <!-- Weather View -->
             <div id="weather-display" class="weather-view hidden">
-                <header class="weather-header">
-                    <div class="location-meta">
-                        <span class="label">LOCATION</span>
-                        <h2 id="city-name">--</h2>
-                        <p id="date-today">--</p>
-                    </div>
-                    <div class="condition-meta">
-                        <span id="weather-condition">--</span>
-                    </div>
-                </header>
+                <div class="header-info">
+                    <h2 id="city-name">--</h2>
+                    <p id="date-today">--</p>
+                </div>
 
-                <div class="weather-hero">
-                    <div class="temp-display">
-                        <span id="temperature">--</span><span class="deg">°</span>
+                <div class="weather-core">
+                    <div class="temp-main">
+                        <span id="temperature">--</span>
                     </div>
-                    <div class="weather-visual">
+                    <div class="condition-visual">
                         <img id="weather-icon" src="" alt="">
+                        <p id="weather-condition" class="condition-text">--</p>
                     </div>
                 </div>
 
-                <div class="weather-grid">
-                    <div class="grid-card">
-                        <span class="grid-label">HUMIDITY</span>
-                        <div class="grid-value">
-                            <span id="humidity">--</span><span class="grid-unit">%</span>
+                <div class="details-grid">
+                    <div class="detail-card">
+                        <span class="detail-label">HUMIDITY</span>
+                        <div class="detail-value">
+                            <span id="humidity">--</span>%
                         </div>
                     </div>
-                    <div class="grid-card">
-                        <span class="grid-label">WIND SPEED</span>
-                        <div class="grid-value">
-                            <span id="wind-speed">--</span><span class="grid-unit">km/h</span>
-                        </div>
-                    </div>
-                    <div class="grid-card">
-                        <span class="grid-label">VISIBILITY</span>
-                        <div class="grid-value">
-                            <span>Excellent</span>
-                        </div>
-                    </div>
-                    <div class="grid-card">
-                        <span class="grid-label">UV INDEX</span>
-                        <div class="grid-value">
-                            <span>Moderate</span>
+                    <div class="detail-card">
+                        <span class="detail-label">WIND SPEED</span>
+                        <div class="detail-value">
+                            <span id="wind-speed">--</span> km/h
                         </div>
                     </div>
                 </div>

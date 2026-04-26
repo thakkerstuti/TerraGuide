@@ -1,7 +1,6 @@
 /**
- * TerraGuide - Advanced Weather Experience
- * Design: Editorial Dashboard
- * API: Open-Meteo (High-Accuracy Real-Time Data)
+ * TerraGuide - Radiant Weather Experience
+ * Design: Radiant Ombre + Glassmorphism
  */
 
 // --- DOM ELEMENTS ---
@@ -16,7 +15,6 @@ const getLocationBtn = document.getElementById('get-location-btn');
 const recentList = document.getElementById('recent-list');
 const recentContainer = document.getElementById('recent-searches');
 
-// Weather Card Elements
 const cityNameEl = document.getElementById('city-name');
 const dateTodayEl = document.getElementById('date-today');
 const weatherIconEl = document.getElementById('weather-icon');
@@ -29,27 +27,19 @@ const windSpeedEl = document.getElementById('wind-speed');
 document.addEventListener('DOMContentLoaded', () => {
     updateDate();
     loadSearchHistory();
-    
-    // Auto-detect location on load
     autoDetectLocation();
 });
 
 // --- EVENT LISTENERS ---
 searchBtn.addEventListener('click', () => {
     const city = cityInput.value.trim();
-    if (city) {
-        fetchWeatherByCity(city);
-        cityInput.value = ''; // Clear input for better UX
-    }
+    if (city) fetchWeatherByCity(city);
 });
 
 cityInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const city = cityInput.value.trim();
-        if (city) {
-            fetchWeatherByCity(city);
-            cityInput.value = '';
-        }
+        if (city) fetchWeatherByCity(city);
     }
 });
 
@@ -65,12 +55,13 @@ async function fetchWeatherByCity(city) {
         const geoData = await geoRes.json();
 
         if (!geoData.results || geoData.results.length === 0) {
-            throw new Error('LOCATION UNKNOWN. PLEASE TRY ANOTHER COORDINATE.');
+            throw new Error('City not found. Try another location.');
         }
 
         const { latitude, longitude, name, country } = geoData.results[0];
         await fetchWeatherData(latitude, longitude, name, country);
         addToHistory(name);
+        cityInput.value = '';
     } catch (error) {
         showError(error.message);
     }
@@ -84,7 +75,7 @@ async function fetchWeatherData(lat, lon, cityName, country = '') {
         const data = await res.json();
 
         if (!data.current_weather) {
-            throw new Error('ATMOSPHERIC DATA UNAVAILABLE.');
+            throw new Error('Weather data unavailable.');
         }
 
         displayWeather({
@@ -101,11 +92,11 @@ async function fetchWeatherData(lat, lon, cityName, country = '') {
 }
 
 function displayWeather(data) {
-    const { name, country, temp, windspeed, conditionCode, humidity } = data;
+    const { name, temp, windspeed, conditionCode, humidity } = data;
     const condition = getWeatherCondition(conditionCode);
 
     cityNameEl.textContent = name;
-    temperatureEl.textContent = Math.round(temp);
+    temperatureEl.textContent = `${Math.round(temp)}°`;
     conditionEl.textContent = condition.text;
     humidityEl.textContent = humidity;
     windSpeedEl.textContent = windspeed;
@@ -113,6 +104,7 @@ function displayWeather(data) {
     weatherIconEl.src = condition.icon;
     weatherIconEl.alt = condition.text;
 
+    // Transition Background based on condition
     updateTheme(condition.text);
     
     loadingSpinner.classList.add('hidden');
@@ -138,21 +130,18 @@ function getWeatherCondition(code) {
 }
 
 function updateTheme(condition) {
-    document.body.className = ''; 
+    const spheres = document.querySelectorAll('.ombre-sphere');
     const cond = condition.toLowerCase();
     
     if (cond.includes('clear')) {
-        document.body.classList.add('theme-clear');
+        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #f7971e, #ffd200)';
+        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #4facfe, #00f2fe)';
     } else if (cond.includes('cloud') || cond.includes('overcast')) {
-        document.body.classList.add('theme-clouds');
+        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #757f9a, #d7dde8)';
+        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #2c3e50, #4ca1af)';
     } else if (cond.includes('rain')) {
-        document.body.classList.add('theme-rain');
-    } else if (cond.includes('snow')) {
-        document.body.classList.add('theme-snow');
-    } else if (cond.includes('thunder')) {
-        document.body.classList.add('theme-thunderstorm');
-    } else {
-        document.body.classList.add('theme-default');
+        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #203a43, #2c5364)';
+        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #0f2027, #203a43)';
     }
 }
 
@@ -160,7 +149,7 @@ function autoDetectLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                fetchWeatherData(position.coords.latitude, position.coords.longitude, 'Local Territory');
+                fetchWeatherData(position.coords.latitude, position.coords.longitude, 'My Territory');
             },
             (error) => {
                 console.warn('Geolocation denied:', error.message);
@@ -214,6 +203,6 @@ function showError(message) {
 }
 
 function updateDate() {
-    const options = { weekday: 'long', day: 'numeric', month: 'long' };
-    dateTodayEl.textContent = new Date().toLocaleDateString('en-US', options).toUpperCase();
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    dateTodayEl.textContent = new Date().toLocaleDateString('en-US', options);
 }
