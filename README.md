@@ -1,51 +1,48 @@
-# 🌿 TerraGuide: Localized Climate Action
+# 🌤️ TerraGuide: Premium Real-Time Weather Insights
 
-TerraGuide is a modern, location-aware web application designed to help individuals understand their environmental impact and discover practical, hyper-local solutions to combat climate change.
+TerraGuide is a high-performance, responsive weather application designed for modern users. It provides real-time atmospheric data, intuitive city-based searching, and a dynamic user interface that adapts visually to current weather conditions.
 
 ## 🚀 Key Features
 
-- **📍 Location-Aware Analysis**: Set your country, city, and regional profile (Urban, Water Scarce, Coal Heavy, etc.) to get tailored climate insights.
-- **🌡️ Live Weather Integration**: View real-time temperature and weather conditions for your city, connecting your lifestyle choices to current local context.
-- **📊 Guided Lifestyle Audit**: A multi-step wizard that evaluates your daily impact across Carbon, Energy, Water, and Waste.
-- **🌱 Personalized Action Plans**: Receive localized recommendations (e.g., Greywater Recycling in arid regions) to effectively lower your footprint.
-- **✨ Modern Nature-Inspired UI**: A premium user experience featuring emerald gradients, glassmorphism, and smooth transitions.
+- **📍 Real-Time Weather Data**: Fetches accurate temperature, humidity, wind speed, and atmospheric conditions for any searched city globally.
+- **✨ Dynamic Background Themes**: Implements an intelligent UI system that automatically transitions background gradients and themes based on weather conditions (Clear, Clouds, Rain, Snow, etc.).
+- **🌍 Location Auto-Detection**: Integrated Browser Geolocation API to instantly provide local weather insights upon application load.
+- **📱 Responsive Glassmorphism Design**: A premium, mobile-first design built with Vanilla CSS, featuring blur effects, smooth animations, and a sleek modern aesthetic.
+- **🕒 Search History**: Utilizes `localStorage` to persist recent searches, allowing users to quickly toggle between frequently checked locations.
+- **🔄 Loading & Error Handling**: Robust error handling for invalid city names or connectivity issues, accompanied by smooth loading states.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [React.js](https://reactjs.org/) + [Vite](https://vitejs.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: Vanilla CSS with Modern Gradations & Glassmorphism
-- **API**: [Open-Meteo](https://open-meteo.com/) (Weather & Geocoding)
+- **Frontend**: HTML5, Vanilla CSS3 (Custom properties, Flexbox, Grid)
+- **Logic**: Vanilla JavaScript (ES6+, Fetch API, Geolocation API, LocalStorage)
+- **API**: [OpenWeatherMap REST API](https://openweathermap.org/api)
+- **Typography**: [Google Fonts (Outfit)](https://fonts.google.com/specimen/Outfit)
+- **Icons**: [Font Awesome 6](https://fontawesome.com/)
 
-## 📦 Getting Started
+## 📦 Setup & Installation
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v18+)
-- [npm](https://www.npmjs.com/)
-
-### Installation
-
-1. Clone the repository:
+1. **Clone the Repository**:
    ```bash
    git clone https://github.com/thakkerstuti/TerraGuide.git
    cd TerraGuide
    ```
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+2. **API Configuration**:
+   - Obtain a free API Key from [OpenWeatherMap](https://home.openweathermap.org/users/sign_up).
+   - Open `script.js` and replace `'YOUR_API_KEY'` with your actual API key on line 8.
 
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+3. **Run Locally**:
+   - Simply open `index.html` in any modern web browser.
+   - Alternatively, use a live server extension or run `npm run dev` if using the Vite development environment.
 
-## 🌍 Why TerraGuide?
+## 📸 Screenshots
 
-Climate action often feels abstract. TerraGuide bridges the gap between global data and individual action by highlighting regional resource priorities and offering solutions that work in *your* specific community.
+*(Add your screenshots here to showcase the stunning UI!)*
 
-## 📜 License
+- **Clear Weather**: Vibrant sunny gradients.
+- **Rainy Weather**: Deep moody blues with glassmorphism overlays.
+- **Mobile View**: Perfectly scaled for compact devices.
 
-Distributed under the MIT License. See `LICENSE` for more information.
+---
+
+**Developed with ❤️ for a sustainable and informed future.**

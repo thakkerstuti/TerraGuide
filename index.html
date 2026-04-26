@@ -1,13 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>project2</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TerraGuide | Premium Weather Insights</title>
+    <meta name="description" content="A premium, responsive weather application with real-time data, dynamic themes, and location auto-detection.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-default">
+    <div class="background-overlay"></div>
+    
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h1>TerraGuide</h1>
+            </div>
+            <div class="search-box">
+                <input type="text" id="city-input" placeholder="Search city..." autocomplete="off">
+                <button id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </header>
+
+        <main id="weather-display" class="hidden">
+            <div class="weather-card">
+                <div class="location-info">
+                    <h2 id="city-name">London, UK</h2>
+                    <p id="date-today">Monday, 24 April</p>
+                </div>
+                
+                <div class="weather-main">
+                    <div class="condition-icon">
+                        <img id="weather-icon" src="" alt="Weather Icon">
+                    </div>
+                    <div class="temp-container">
+                        <span id="temperature">22</span><span class="unit">°C</span>
+                    </div>
+                    <p id="weather-condition">Partly Cloudy</p>
+                </div>
+
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <i class="fas fa-droplet"></i>
+                        <div class="detail-text">
+                            <span class="label">Humidity</span>
+                            <span id="humidity" class="value">45%</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-wind"></i>
+                        <div class="detail-text">
+                            <span class="label">Wind Speed</span>
+                            <span id="wind-speed" class="value">12 km/h</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="recent-searches" class="recent-container hidden">
+                <h3>Recent Searches</h3>
+                <div id="recent-list" class="recent-list"></div>
+            </div>
+        </main>
+
+        <div id="loading-spinner" class="spinner-container hidden">
+            <div class="spinner"></div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <div id="error-message" class="error-container hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="error-text">City not found. Please try again.</p>
+        </div>
+
+        <div id="initial-state" class="initial-container">
+            <i class="fas fa-cloud-sun-rain"></i>
+            <h2>Welcome to TerraGuide</h2>
+            <p>Search for a city or allow location access to see the weather.</p>
+            <button id="get-location-btn" class="btn-primary">
+                <i class="fas fa-location-arrow"></i> Use Current Location
+            </button>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 TerraGuide • Weather Intelligence</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
 </html>
