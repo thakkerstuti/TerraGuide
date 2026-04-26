@@ -1,12 +1,8 @@
 /**
  * TerraGuide - Premium Weather Application
  * Features: City search, Geolocation, Dynamic Themes, Search History
+ * Using Open-Meteo API (No Key Required for testing)
  */
-
-// --- CONFIGURATION ---
-// Replace with your own OpenWeatherMap API Key
-const API_KEY = 'YOUR_API_KEY'; 
-const API_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
 // --- DOM ELEMENTS ---
 const cityInput = document.getElementById('city-input');
@@ -41,13 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- EVENT LISTENERS ---
 searchBtn.addEventListener('click', () => {
     const city = cityInput.value.trim();
-    if (city) fetchWeather(city);
+    if (city) fetchWeatherByCity(city);
 });
 
 cityInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         const city = cityInput.value.trim();
-        if (city) fetchWeather(city);
+        if (city) fetchWeatherByCity(city);
     }
 });
 
@@ -56,30 +52,49 @@ getLocationBtn.addEventListener('click', autoDetectLocation);
 // --- FUNCTIONS ---
 
 /**
- * Fetch weather data from API
- * @param {string} query - City name or coordinates
- * @param {boolean} isCoords - Whether query is lat/lon object
+ * Fetch weather by city name (Geocoding + Weather API)
  */
-async function fetchWeather(query, isCoords = false) {
+async function fetchWeatherByCity(city) {
     showLoading();
-    
-    let url = '';
-    if (isCoords) {
-        url = `${API_BASE_URL}?lat=${query.lat}&lon=${query.lon}&appid=${API_KEY}&units=metric`;
-    } else {
-        url = `${API_BASE_URL}?q=${encodeURIComponent(query)}&appid=${API_KEY}&units=metric`;
-    }
-
     try {
-        const response = await fetch(url);
-        const data = await response.json();
+        // 1. Geocoding API to get coordinates
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+        const geoRes = await fetch(geoUrl);
+        const geoData = await geoRes.json();
 
-        if (!response.ok) {
-            throw new Error(data.message || 'City not found');
+        if (!geoData.results || geoData.results.length === 0) {
+            throw new Error('City not found. Please try another name.');
         }
 
-        displayWeather(data);
-        if (!isCoords) addToHistory(data.name);
+        const { latitude, longitude, name, country } = geoData.results[0];
+        await fetchWeatherData(latitude, longitude, `${name}, ${country || ''}`);
+        addToHistory(name);
+    } catch (error) {
+        showError(error.message);
+    }
+}
+
+/**
+ * Fetch weather data by coordinates
+ */
+async function fetchWeatherData(lat, lon, locationLabel) {
+    showLoading();
+    try {
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`;
+        const res = await fetch(weatherUrl);
+        const data = await res.json();
+
+        if (!data.current_weather) {
+            throw new Error('Weather data unavailable.');
+        }
+
+        displayWeather({
+            name: locationLabel,
+            temp: data.current_weather.temperature,
+            windspeed: data.current_weather.windspeed,
+            conditionCode: data.current_weather.weathercode,
+            humidity: data.hourly ? data.hourly.relativehumidity_2m[0] : '--'
+        });
     } catch (error) {
         showError(error.message);
     }
@@ -87,27 +102,24 @@ async function fetchWeather(query, isCoords = false) {
 
 /**
  * Display weather data in the UI
- * @param {Object} data - API response data
  */
 function displayWeather(data) {
-    const { name, sys, main, weather, wind } = data;
-    const { temp, humidity } = main;
-    const { description, icon, main: conditionMain } = weather[0];
-    const { speed } = wind;
+    const { name, temp, windspeed, conditionCode, humidity } = data;
+    const condition = getWeatherCondition(conditionCode);
 
     // Update UI elements
-    cityNameEl.textContent = `${name}, ${sys.country}`;
+    cityNameEl.textContent = name;
     temperatureEl.textContent = Math.round(temp);
-    conditionEl.textContent = description;
+    conditionEl.textContent = condition.text;
     humidityEl.textContent = `${humidity}%`;
-    windSpeedEl.textContent = `${speed} m/s`;
+    windSpeedEl.textContent = `${windspeed} km/h`;
     
-    // Weather Icon (using OWM default icons)
-    weatherIconEl.src = `https://openweathermap.org/img/wn/${icon}@4x.png`;
-    weatherIconEl.alt = description;
+    // Weather Icon (using dynamic icons based on condition)
+    weatherIconEl.src = condition.icon;
+    weatherIconEl.alt = condition.text;
 
     // Update background theme
-    updateTheme(conditionMain);
+    updateTheme(condition.text);
     
     // Manage visibility
     loadingSpinner.classList.add('hidden');
@@ -117,18 +129,38 @@ function displayWeather(data) {
 }
 
 /**
- * Update dynamic background theme based on weather condition
- * @param {string} condition - Main weather condition (e.g., Clear, Clouds, Rain)
+ * Map Open-Meteo WMO codes to human-readable text and icons
+ */
+function getWeatherCondition(code) {
+    const conditions = {
+        0: { text: 'Clear Sky', icon: 'https://openweathermap.org/img/wn/01d@4x.png' },
+        1: { text: 'Mainly Clear', icon: 'https://openweathermap.org/img/wn/02d@4x.png' },
+        2: { text: 'Partly Cloudy', icon: 'https://openweathermap.org/img/wn/03d@4x.png' },
+        3: { text: 'Overcast', icon: 'https://openweathermap.org/img/wn/04d@4x.png' },
+        45: { text: 'Foggy', icon: 'https://openweathermap.org/img/wn/50d@4x.png' },
+        61: { text: 'Slight Rain', icon: 'https://openweathermap.org/img/wn/10d@4x.png' },
+        63: { text: 'Moderate Rain', icon: 'https://openweathermap.org/img/wn/10d@4x.png' },
+        65: { text: 'Heavy Rain', icon: 'https://openweathermap.org/img/wn/09d@4x.png' },
+        71: { text: 'Slight Snow', icon: 'https://openweathermap.org/img/wn/13d@4x.png' },
+        95: { text: 'Thunderstorm', icon: 'https://openweathermap.org/img/wn/11d@4x.png' }
+    };
+
+    // Default to cloudy if code not found
+    return conditions[code] || { text: 'Cloudy', icon: 'https://openweathermap.org/img/wn/04d@4x.png' };
+}
+
+/**
+ * Update dynamic background theme
  */
 function updateTheme(condition) {
-    document.body.className = ''; // Reset
+    document.body.className = ''; 
     const cond = condition.toLowerCase();
     
     if (cond.includes('clear')) {
         document.body.classList.add('theme-clear');
-    } else if (cond.includes('cloud')) {
+    } else if (cond.includes('cloud') || cond.includes('overcast')) {
         document.body.classList.add('theme-clouds');
-    } else if (cond.includes('rain') || cond.includes('drizzle')) {
+    } else if (cond.includes('rain')) {
         document.body.classList.add('theme-rain');
     } else if (cond.includes('snow')) {
         document.body.classList.add('theme-snow');
@@ -140,66 +172,49 @@ function updateTheme(condition) {
 }
 
 /**
- * Detect user's current location using Geolocation API
+ * Detect user's current location
  */
 function autoDetectLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                const coords = {
-                    lat: position.coords.latitude,
-                    lon: position.coords.longitude
-                };
-                fetchWeather(coords, true);
+                fetchWeatherData(position.coords.latitude, position.coords.longitude, 'Current Location');
             },
             (error) => {
-                console.warn('Geolocation denied or failed:', error.message);
-                // If it fails, we just stay in initial state or do nothing
-                if (initialState.classList.contains('hidden') && weatherDisplay.classList.contains('hidden')) {
+                console.warn('Geolocation denied:', error.message);
+                if (weatherDisplay.classList.contains('hidden')) {
                     initialState.classList.remove('hidden');
                 }
             }
         );
-    } else {
-        console.error('Geolocation is not supported by this browser.');
     }
 }
 
 /**
- * Handle Search History with LocalStorage
+ * Handle Search History
  */
 function addToHistory(city) {
     let history = JSON.parse(localStorage.getItem('weatherHistory')) || [];
-    
-    // Remove if already exists (to bring it to top)
     history = history.filter(item => item.toLowerCase() !== city.toLowerCase());
-    
-    // Add to start
     history.unshift(city);
-    
-    // Keep only last 5
     history = history.slice(0, 5);
-    
     localStorage.setItem('weatherHistory', JSON.stringify(history));
     loadSearchHistory();
 }
 
 function loadSearchHistory() {
     const history = JSON.parse(localStorage.getItem('weatherHistory')) || [];
-    
     if (history.length === 0) {
         recentContainer.classList.add('hidden');
         return;
     }
-
     recentContainer.classList.remove('hidden');
     recentList.innerHTML = '';
-    
     history.forEach(city => {
         const tag = document.createElement('span');
         tag.className = 'recent-tag';
         tag.textContent = city;
-        tag.onclick = () => fetchWeather(city);
+        tag.onclick = () => fetchWeatherByCity(city);
         recentList.appendChild(tag);
     });
 }
@@ -216,6 +231,7 @@ function showLoading() {
 function showError(message) {
     loadingSpinner.classList.add('hidden');
     weatherDisplay.classList.add('hidden');
+    initialState.classList.add('hidden'); // Explicitly hide initial state
     errorMessage.classList.remove('hidden');
     errorText.textContent = message;
 }
