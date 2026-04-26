@@ -1,6 +1,7 @@
 /**
  * TerraGuide - Radiant Weather Experience
  * Design: Radiant Ombre + Glassmorphism
+ * Features: Day/Night dynamic icons, Morning/Evening themes
  */
 
 // --- DOM ELEMENTS ---
@@ -84,6 +85,7 @@ async function fetchWeatherData(lat, lon, cityName, country = '') {
             temp: data.current_weather.temperature,
             windspeed: data.current_weather.windspeed,
             conditionCode: data.current_weather.weathercode,
+            isDay: data.current_weather.is_day,
             humidity: data.hourly ? data.hourly.relativehumidity_2m[0] : '--'
         });
     } catch (error) {
@@ -92,8 +94,8 @@ async function fetchWeatherData(lat, lon, cityName, country = '') {
 }
 
 function displayWeather(data) {
-    const { name, temp, windspeed, conditionCode, humidity } = data;
-    const condition = getWeatherCondition(conditionCode);
+    const { name, temp, windspeed, conditionCode, isDay, humidity } = data;
+    const condition = getWeatherCondition(conditionCode, isDay);
 
     cityNameEl.textContent = name;
     temperatureEl.textContent = `${Math.round(temp)}°`;
@@ -104,8 +106,8 @@ function displayWeather(data) {
     weatherIconEl.src = condition.icon;
     weatherIconEl.alt = condition.text;
 
-    // Transition Background based on condition
-    updateTheme(condition.text);
+    // Transition Background based on time and condition
+    updateTheme(condition.text, isDay);
     
     loadingSpinner.classList.add('hidden');
     errorMessage.classList.add('hidden');
@@ -113,36 +115,60 @@ function displayWeather(data) {
     weatherDisplay.classList.remove('hidden');
 }
 
-function getWeatherCondition(code) {
+/**
+ * Map codes to specific Day/Night icons
+ */
+function getWeatherCondition(code, isDay) {
+    const suffix = isDay ? 'd' : 'n';
     const conditions = {
-        0: { text: 'Clear Sky', icon: 'https://openweathermap.org/img/wn/01d@4x.png' },
-        1: { text: 'Mainly Clear', icon: 'https://openweathermap.org/img/wn/02d@4x.png' },
-        2: { text: 'Partly Cloudy', icon: 'https://openweathermap.org/img/wn/03d@4x.png' },
-        3: { text: 'Overcast', icon: 'https://openweathermap.org/img/wn/04d@4x.png' },
-        45: { text: 'Foggy', icon: 'https://openweathermap.org/img/wn/50d@4x.png' },
-        61: { text: 'Slight Rain', icon: 'https://openweathermap.org/img/wn/10d@4x.png' },
-        63: { text: 'Moderate Rain', icon: 'https://openweathermap.org/img/wn/10d@4x.png' },
-        65: { text: 'Heavy Rain', icon: 'https://openweathermap.org/img/wn/09d@4x.png' },
-        71: { text: 'Slight Snow', icon: 'https://openweathermap.org/img/wn/13d@4x.png' },
-        95: { text: 'Thunderstorm', icon: 'https://openweathermap.org/img/wn/11d@4x.png' }
+        0: { text: isDay ? 'Sunny' : 'Clear Night', icon: `https://openweathermap.org/img/wn/01${suffix}@4x.png` },
+        1: { text: isDay ? 'Mainly Sunny' : 'Clear', icon: `https://openweathermap.org/img/wn/02${suffix}@4x.png` },
+        2: { text: 'Partly Cloudy', icon: `https://openweathermap.org/img/wn/03${suffix}@4x.png` },
+        3: { text: 'Overcast', icon: `https://openweathermap.org/img/wn/04${suffix}@4x.png` },
+        45: { text: 'Foggy', icon: `https://openweathermap.org/img/wn/50${suffix}@4x.png` },
+        61: { text: 'Rainy', icon: `https://openweathermap.org/img/wn/10${suffix}@4x.png` },
+        63: { text: 'Moderate Rain', icon: `https://openweathermap.org/img/wn/10${suffix}@4x.png` },
+        65: { text: 'Heavy Rain', icon: `https://openweathermap.org/img/wn/09${suffix}@4x.png` },
+        71: { text: 'Snowy', icon: `https://openweathermap.org/img/wn/13${suffix}@4x.png` },
+        95: { text: 'Thunderstorm', icon: `https://openweathermap.org/img/wn/11${suffix}@4x.png` }
     };
-    return conditions[code] || { text: 'Variable', icon: 'https://openweathermap.org/img/wn/04d@4x.png' };
+    return conditions[code] || { text: 'Variable', icon: `https://openweathermap.org/img/wn/04${suffix}@4x.png` };
 }
 
-function updateTheme(condition) {
+/**
+ * Radiant Background Logic for Morning, Evening, Day, and Night
+ */
+function updateTheme(condition, isDay) {
     const spheres = document.querySelectorAll('.ombre-sphere');
-    const cond = condition.toLowerCase();
+    const hour = new Date().getHours();
     
-    if (cond.includes('clear')) {
-        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #f7971e, #ffd200)';
-        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #4facfe, #00f2fe)';
-    } else if (cond.includes('cloud') || cond.includes('overcast')) {
-        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #757f9a, #d7dde8)';
-        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #2c3e50, #4ca1af)';
-    } else if (cond.includes('rain')) {
-        spheres[0].style.background = 'conic-gradient(from 180deg at 50% 50%, #203a43, #2c5364)';
-        spheres[1].style.background = 'conic-gradient(from 0deg at 50% 50%, #0f2027, #203a43)';
+    // Default Time-based colors
+    let sphere1 = 'conic-gradient(from 180deg at 50% 50%, #4facfe, #00f2fe)';
+    let sphere2 = 'conic-gradient(from 0deg at 50% 50%, #f093fb, #f5576c)';
+
+    if (!isDay) {
+        // Night Theme
+        sphere1 = 'conic-gradient(from 180deg at 50% 50%, #0f0c29, #302b63)';
+        sphere2 = 'conic-gradient(from 0deg at 50% 50%, #24243e, #0f0c29)';
+    } else if (hour >= 5 && hour < 9) {
+        // Morning Theme
+        sphere1 = 'conic-gradient(from 180deg at 50% 50%, #ff9a9e, #fad0c4)';
+        sphere2 = 'conic-gradient(from 0deg at 50% 50%, #fbc2eb, #a6c1ee)';
+    } else if (hour >= 17 && hour < 20) {
+        // Evening Theme
+        sphere1 = 'conic-gradient(from 180deg at 50% 50%, #ff0844, #ffb199)';
+        sphere2 = 'conic-gradient(from 0deg at 50% 50%, #667eea, #764ba2)';
     }
+
+    // Weather adjustments override
+    const cond = condition.toLowerCase();
+    if (cond.includes('rain')) {
+        sphere1 = 'conic-gradient(from 180deg at 50% 50%, #203a43, #2c5364)';
+        sphere2 = 'conic-gradient(from 0deg at 50% 50%, #0f2027, #203a43)';
+    }
+
+    spheres[0].style.background = sphere1;
+    spheres[1].style.background = sphere2;
 }
 
 function autoDetectLocation() {
