@@ -3,94 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TerraGuide | Premium Weather Insights</title>
-    <meta name="description" content="A premium, responsive weather application with real-time data, dynamic themes, and location auto-detection.">
+    <title>TerraGuide | Advanced Weather Intelligence</title>
+    <meta name="description" content="A unique, editorial weather experience with real-time data and dynamic atmospheric themes.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-default">
-    <div class="background-overlay"></div>
+    <div class="noise-overlay"></div>
+    <div class="background-blob blob-1"></div>
+    <div class="background-blob blob-2"></div>
     
-    <div class="app-container">
-        <header>
-            <div class="logo">
-                <i class="fas fa-leaf"></i>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="logo-icon">T</span>
                 <h1>TerraGuide</h1>
             </div>
-            <div class="search-box">
-                <input type="text" id="city-input" placeholder="Search city..." autocomplete="off">
-                <button id="search-btn"><i class="fas fa-search"></i></button>
-            </div>
-        </header>
-
-        <main id="weather-display" class="hidden">
-            <div class="weather-card">
-                <div class="location-info">
-                    <h2 id="city-name">London, UK</h2>
-                    <p id="date-today">Monday, 24 April</p>
-                </div>
-                
-                <div class="weather-main">
-                    <div class="condition-icon">
-                        <img id="weather-icon" src="" alt="Weather Icon">
-                    </div>
-                    <div class="temp-container">
-                        <span id="temperature">22</span><span class="unit">°C</span>
-                    </div>
-                    <p id="weather-condition">Partly Cloudy</p>
-                </div>
-
-                <div class="weather-details">
-                    <div class="detail-item">
-                        <i class="fas fa-droplet"></i>
-                        <div class="detail-text">
-                            <span class="label">Humidity</span>
-                            <span id="humidity" class="value">45%</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-wind"></i>
-                        <div class="detail-text">
-                            <span class="label">Wind Speed</span>
-                            <span id="wind-speed" class="value">12 km/h</span>
-                        </div>
-                    </div>
+            
+            <div class="search-section">
+                <div class="input-wrapper">
+                    <input type="text" id="city-input" placeholder="Find your city..." autocomplete="off">
+                    <button id="search-btn"><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
 
-            <div id="recent-searches" class="recent-container hidden">
-                <h3>Recent Searches</h3>
-                <div id="recent-list" class="recent-list"></div>
+            <div id="recent-searches" class="history-section hidden">
+                <h3>PREVIOUS</h3>
+                <div id="recent-list" class="history-list"></div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Weather data provided by Open-Meteo. Updated in real-time.</p>
+                <button id="get-location-btn" class="btn-location">
+                    <i class="fas fa-crosshairs"></i> Use Local
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-stage">
+            <div id="initial-state" class="state-view">
+                <div class="hero-text">
+                    <h2>Explore the <br><em>atmosphere.</em></h2>
+                    <p>Enter a city or use your location to begin the experience.</p>
+                </div>
+            </div>
+
+            <div id="loading-spinner" class="state-view hidden">
+                <div class="loading-bar-container">
+                    <div class="loading-bar"></div>
+                </div>
+                <p>SYNCHRONIZING DATA...</p>
+            </div>
+
+            <div id="error-message" class="state-view hidden">
+                <div class="error-content">
+                    <i class="fas fa-ghost"></i>
+                    <h2>Location lost.</h2>
+                    <p id="error-text">We couldn't find that city. Try something else.</p>
+                </div>
+            </div>
+
+            <div id="weather-display" class="weather-view hidden">
+                <header class="weather-header">
+                    <div class="location-meta">
+                        <span class="label">LOCATION</span>
+                        <h2 id="city-name">--</h2>
+                        <p id="date-today">--</p>
+                    </div>
+                    <div class="condition-meta">
+                        <span id="weather-condition">--</span>
+                    </div>
+                </header>
+
+                <div class="weather-hero">
+                    <div class="temp-display">
+                        <span id="temperature">--</span><span class="deg">°</span>
+                    </div>
+                    <div class="weather-visual">
+                        <img id="weather-icon" src="" alt="">
+                    </div>
+                </div>
+
+                <div class="weather-grid">
+                    <div class="grid-card">
+                        <span class="grid-label">HUMIDITY</span>
+                        <div class="grid-value">
+                            <span id="humidity">--</span><span class="grid-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="grid-card">
+                        <span class="grid-label">WIND SPEED</span>
+                        <div class="grid-value">
+                            <span id="wind-speed">--</span><span class="grid-unit">km/h</span>
+                        </div>
+                    </div>
+                    <div class="grid-card">
+                        <span class="grid-label">VISIBILITY</span>
+                        <div class="grid-value">
+                            <span>Excellent</span>
+                        </div>
+                    </div>
+                    <div class="grid-card">
+                        <span class="grid-label">UV INDEX</span>
+                        <div class="grid-value">
+                            <span>Moderate</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
-
-        <div id="loading-spinner" class="spinner-container hidden">
-            <div class="spinner"></div>
-            <p>Fetching weather data...</p>
-        </div>
-
-        <div id="error-message" class="error-container hidden">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p id="error-text">City not found. Please try again.</p>
-        </div>
-
-        <div id="initial-state" class="initial-container">
-            <i class="fas fa-cloud-sun-rain"></i>
-            <h2>Welcome to TerraGuide</h2>
-            <p>Search for a city or allow location access to see the weather.</p>
-            <button id="get-location-btn" class="btn-primary">
-                <i class="fas fa-location-arrow"></i> Use Current Location
-            </button>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 TerraGuide • Weather Intelligence</p>
-        </footer>
     </div>
 
     <script src="script.js"></script>
